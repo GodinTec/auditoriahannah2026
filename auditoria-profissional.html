@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auditoria Profissional — Nancy Hannah</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,600;1,500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #0a0a10;
+    color: #e0e0e8;
+    overflow-x: hidden;
+  }
+
+  /* LOGIN OVERLAY */
+  #login-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #0a0a10;
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 24px;
+  }
+  #login-overlay .lock-icon {
+    font-size: 48px;
+    opacity: 0.3;
+  }
+  #login-overlay h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    color: #f0e8dc;
+    font-weight: 600;
+  }
+  #login-overlay p {
+    color: #6666aa;
+    font-size: 14px;
+    max-width: 360px;
+    text-align: center;
+    line-height: 1.6;
+  }
+  #login-overlay input {
+    padding: 14px 24px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.04);
+    color: #fff;
+    font-size: 16px;
+    width: 300px;
+    text-align: center;
+    outline: none;
+    font-family: 'Inter', sans-serif;
+    transition: border-color 0.2s;
+  }
+  #login-overlay input:focus {
+    border-color: rgba(79,172,254,0.3);
+  }
+  #login-overlay .error {
+    color: #ff6b6b;
+    font-size: 13px;
+    display: none;
+  }
+  #login-overlay .btn-login {
+    padding: 14px 48px;
+    border-radius: 50px;
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    color: #080810;
+    font-weight: 700;
+    font-size: 15px;
+    border: none;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: transform 0.2s;
+  }
+  #login-overlay .btn-login:hover {
+    transform: translateY(-2px);
+  }
+  .login-hint {
+    font-size: 12px;
+    color: #444466;
+    margin-top: 8px;
+  }
+
+  /* HEADER */
+  .report-header {
+    padding: 60px 48px 40px;
+    max-width: 1300px;
+    margin: 0 auto;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .report-header .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 20px;
+    border-radius: 30px;
+    background: rgba(79,172,254,0.06);
+    border: 1px solid rgba(79,172,254,0.12);
+    color: #4facfe;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  .report-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(40px, 5vw, 72px);
+    font-weight: 600;
+    color: #f0f0ff;
+    line-height: 1.08;
+    margin-bottom: 12px;
+  }
+  .report-header .subtitle {
+    font-size: 18px;
+    color: #8888aa;
+    font-weight: 300;
+    max-width: 700px;
+    line-height: 1.7;
+  }
+  .report-header .meta {
+    display: flex;
+    gap: 32px;
+    margin-top: 32px;
+    flex-wrap: wrap;
+  }
+  .report-header .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #6666aa;
+  }
+  .report-header .meta-item span {
+    color: #4facfe;
+    font-weight: 600;
+  }
+
+  /* SCORE CARD */
+  .score-section {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 60px 48px;
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+  .score-ring {
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .score-ring svg {
+    position: absolute;
+    transform: rotate(-90deg);
+  }
+  .score-ring .bg-circle {
+    fill: none;
+    stroke: rgba(255,255,255,0.04);
+    stroke-width: 8;
+  }
+  .score-ring .progress-circle {
+    fill: none;
+    stroke: url(#scoreGrad);
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-dasharray: 754;
+    stroke-dashoffset: 226;
+    transition: stroke-dashoffset 1.5s ease;
+  }
+  .score-inner {
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+  .score-inner .num {
+    font-size: 64px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1;
+  }
+  .score-inner .label {
+    font-size: 14px;
+    color: #8888aa;
+    margin-top: 4px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .score-details h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    color: #f0f0ff;
+    margin-bottom: 16px;
+  }
+  .score-details p {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #8888aa;
+    margin-bottom: 24px;
+  }
+  .score-bars {
+    display: grid;
+    gap: 14px;
+  }
+  .score-bar-item {
+    display: grid;
+    grid-template-columns: 130px 1fr 40px;
+    align-items: center;
+    gap: 16px;
+  }
+  .score-bar-item .bar-label {
+    font-size: 13px;
+    color: #aaaacc;
+    font-weight: 500;
+  }
+  .score-bar-item .bar-track {
+    height: 6px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .score-bar-item .bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 1s ease;
+  }
+  .score-bar-item .bar-value {
+    font-size: 13px;
+    font-weight: 700;
+    color: #f0f0ff;
+    text-align: right;
+  }
+
+  /* NAV */
+  .report-nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,10,16,0.9);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    padding: 16px 48px;
+    max-width: 1300px;
+    margin: 0 auto;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .report-nav a {
+    padding: 10px 20px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #8888aa;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  .report-nav a:hover {
+    background: rgba(79,172,254,0.06);
+    color: #fff;
+  }
+
+  /* SECTIONS */
+  .section {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 80px 48px;
+  }
+  .section-header {
+    margin-bottom: 48px;
+  }
+  .section-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: #4facfe;
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 3.5vw, 48px);
+    color: #f0f0ff;
+    line-height: 1.12;
+    margin-bottom: 16px;
+  }
+  .section-desc {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #8888aa;
+    max-width: 800px;
+  }
+  .section + .section {
+    border-top: 1px solid rgba(255,255,255,0.04);
+  }
+
+  /* METRIC CARDS */
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 20px;
+  }
+  .metric-card {
+    background: linear-gradient(145deg, #12121e, #1a1a2e);
+    border: 1px solid rgba(79,172,254,0.06);
+    border-radius: 20px;
+    padding: 32px;
+    transition: transform 0.25s;
+  }
+  .metric-card:hover {
+    transform: translateY(-4px);
+  }
+  .metric-card .metric-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .metric-card .metric-icon {
+    font-size: 28px;
+  }
+  .metric-card .metric-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #f0f0ff;
+  }
+  .metric-card .metric-stat {
+    font-size: 36px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .metric-card .metric-sub {
+    font-size: 13px;
+    color: #8888aa;
+    margin-bottom: 16px;
+  }
+  .metric-card .metric-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .status-good {
+    background: rgba(0,200,80,0.1);
+    color: #00c850;
+    border: 1px solid rgba(0,200,80,0.15);
+  }
+  .status-warn {
+    background: rgba(255,180,0,0.1);
+    color: #ffb400;
+    border: 1px solid rgba(255,180,0,0.15);
+  }
+  .status-bad {
+    background: rgba(255,80,80,0.1);
+    color: #ff5050;
+    border: 1px solid rgba(255,80,80,0.15);
+  }
+  .status-info {
+    background: rgba(79,172,254,0.1);
+    color: #4facfe;
+    border: 1px solid rgba(79,172,254,0.15);
+  }
+
+  /* INSIGHT CARDS */
+  .insight-grid {
+    display: grid;
+    gap: 24px;
+  }
+  .insight-card {
+    background: linear-gradient(145deg, #12121e, #1a1a2e);
+    border: 1px solid rgba(79,172,254,0.06);
+    border-radius: 20px;
+    padding: 36px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: start;
+  }
+  .insight-card .problem h4 {
+    font-size: 16px;
+    color: #ff6b6b;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .insight-card .problem p {
+    font-size: 14px;
+    color: #aaaacc;
+    line-height: 1.7;
+  }
+  .insight-card .solution h4 {
+    font-size: 16px;
+    color: #00c850;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .insight-card .solution p {
+    font-size: 14px;
+    color: #aaaacc;
+    line-height: 1.7;
+  }
+  .insight-card .solution .action-btn {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 10px 24px;
+    border-radius: 30px;
+    background: rgba(0,200,80,0.08);
+    border: 1px solid rgba(0,200,80,0.12);
+    color: #00c850;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .insight-card .solution .action-btn:hover {
+    background: rgba(0,200,80,0.12);
+  }
+  .insight-card.alt {
+    grid-template-columns: 1fr;
+  }
+
+  /* STREAMING TABLE */
+  .stream-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 32px;
+    font-size: 14px;
+  }
+  .stream-table th {
+    text-align: left;
+    padding: 16px 20px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #6666aa;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .stream-table td {
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    color: #c0c0d0;
+  }
+  .stream-table tr:hover td {
+    background: rgba(79,172,254,0.02);
+  }
+  .stream-table .platform-icon { font-size: 20px; }
+  .stream-table .check-yes { color: #00c850; font-weight: 700; }
+  .stream-table .check-no { color: #ff5050; }
+  .stream-table .check-partial { color: #ffb400; }
+
+  /* DESIGN SHOWCASE */
+  .design-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 24px;
+    margin-top: 40px;
+  }
+  .design-card {
+    background: linear-gradient(145deg, #12121e, #1a1a2e);
+    border: 1px solid rgba(79,172,254,0.06);
+    border-radius: 20px;
+    overflow: hidden;
+    transition: transform 0.25s;
+  }
+  .design-card:hover {
+    transform: translateY(-4px);
+  }
+  .design-card .preview {
+    aspect-ratio: 9/16;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .design-card .preview .overlay {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 24px;
+    background: linear-gradient(0deg, rgba(10,10,16,0.9), transparent);
+  }
+  .design-card .preview .overlay .v-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: #fff;
+    font-weight: 600;
+  }
+  .design-card .preview .overlay .v-sub {
+    font-size: 12px;
+    color: #8888aa;
+  }
+  .design-card .info {
+    padding: 24px;
+  }
+  .design-card .info .v-style {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 20px;
+    background: rgba(79,172,254,0.06);
+    border: 1px solid rgba(79,172,254,0.08);
+    color: #4facfe;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+  .design-card .info h4 {
+    font-size: 16px;
+    color: #f0f0ff;
+    margin-bottom: 8px;
+  }
+  .design-card .info p {
+    font-size: 13px;
+    color: #8888aa;
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+  .design-card .info .rating {
+    display: flex;
+    gap: 4px;
+    font-size: 14px;
+  }
+  .design-card .info .rating .star-filled { color: #ffb400; }
+  .design-card .info .rating .star-empty { color: #333355; }
+
+  /* RECOMMENDATION LIST */
+  .rec-list {
+    display: grid;
+    gap: 16px;
+    margin-top: 32px;
+  }
+  .rec-item {
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    gap: 20px;
+    padding: 24px 28px;
+    background: linear-gradient(145deg, #12121e, #1a1a2e);
+    border: 1px solid rgba(79,172,254,0.06);
+    border-radius: 16px;
+    transition: transform 0.2s;
+  }
+  .rec-item:hover {
+    transform: translateX(4px);
+  }
+  .rec-item .rec-priority {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 800;
+  }
+  .priority-high .rec-priority { background: rgba(255,80,80,0.1); color: #ff5050; }
+  .priority-medium .rec-priority { background: rgba(255,180,0,0.1); color: #ffb400; }
+  .priority-low .rec-priority { background: rgba(79,172,254,0.1); color: #4facfe; }
+  .rec-item .rec-text h4 { font-size: 16px; color: #f0f0ff; margin-bottom: 4px; }
+  .rec-item .rec-text p { font-size: 14px; color: #8888aa; line-height: 1.6; }
+  .rec-item .rec-text .rec-why {
+    display: block;
+    margin-top: 8px;
+    font-size: 13px;
+    color: #4facfe;
+    font-style: italic;
+  }
+
+  /* PRIORITY MATRIX */
+  .matrix-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 32px;
+  }
+  .matrix-quadrant {
+    padding: 28px;
+    border-radius: 16px;
+    border: 1px solid rgba(79,172,254,0.06);
+  }
+  .matrix-quadrant h4 {
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+  }
+  .matrix-quadrant ul {
+    list-style: none;
+    display: grid;
+    gap: 10px;
+  }
+  .matrix-quadrant li {
+    font-size: 13px;
+    color: #c0c0d0;
+    padding: 8px 14px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.02);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .matrix-quadrant .quad-icon { font-size: 16px; }
+  .quad-do-first { background: rgba(0,200,80,0.04); border-color: rgba(0,200,80,0.1); }
+  .quad-do-first h4 { color: #00c850; }
+  .quad-schedule { background: rgba(79,172,254,0.04); border-color: rgba(79,172,254,0.1); }
+  .quad-schedule h4 { color: #4facfe; }
+  .quad-delegate { background: rgba(255,180,0,0.04); border-color: rgba(255,180,0,0.1); }
+  .quad-delegate h4 { color: #ffb400; }
+  .quad-eliminate { background: rgba(255,80,80,0.04); border-color: rgba(255,80,80,0.1); }
+  .quad-eliminate h4 { color: #ff5050; }
+
+  /* FOOTER */
+  .report-footer {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 40px 48px;
+    border-top: 1px solid rgba(255,255,255,0.04);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .report-footer p {
+    font-size: 13px;
+    color: #444466;
+  }
+  .report-footer span { color: #4facfe; }
+
+  @media (max-width: 768px) {
+    .report-header { padding: 40px 20px; }
+    .report-nav { padding: 12px 20px; }
+    .score-section { grid-template-columns: 1fr; padding: 40px 20px; }
+    .score-ring { width: 200px; height: 200px; margin: 0 auto; }
+    .section { padding: 40px 20px; }
+    .insight-card { grid-template-columns: 1fr; gap: 20px; padding: 24px; }
+    .design-grid { grid-template-columns: 1fr; }
+    .metrics-grid { grid-template-columns: 1fr; }
+    .matrix-grid { grid-template-columns: 1fr; }
+    .report-footer { padding: 24px 20px; flex-direction: column; text-align: center; }
+    .score-bar-item { grid-template-columns: 80px 1fr 36px; gap: 8px; }
+    .score-bar-item .bar-label { font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-overlay">
+  <div class="lock-icon">🔒</div>
+  <h2>Relatório Confidencial</h2>
+  <p>Este relatório contém dados estratégicos e recomendações para o ministério de Nancy Hannah.<br>Digite a senha para acessar.</p>
+  <input type="password" id="senha-input" placeholder="Senha" onkeydown="if(event.key==='Enter') verificarSenha()">
+  <div class="error" id="erro-senha">Senha incorreta. Tente novamente.</div>
+  <button class="btn-login" onclick="verificarSenha()">Acessar Relatório</button>
+  <div class="login-hint">Relatório para uso interno da cantora e equipe</div>
+</div>
+
+<script>
+function verificarSenha() {
+  var s = document.getElementById('senha-input').value;
+  if (s === 'joaozinhofilho10') {
+    document.getElementById('login-overlay').style.display = 'none';
+    document.body.style.overflow = 'auto';
+  } else {
+    document.getElementById('erro-senha').style.display = 'block';
+  }
+}
+document.body.style.overflow = 'hidden';
+</script>
+
+<svg width="0" height="0">
+  <defs>
+    <linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4facfe" />
+      <stop offset="100%" stop-color="#00f2fe" />
+    </linearGradient>
+  </defs>
+</svg>
+
+<!-- HEADER -->
+<header class="report-header">
+  <div class="badge">📊 Relatório de Auditoria Profissional</div>
+  <h1>Nancy Hannah<br>Presença Digital</h1>
+  <p class="subtitle">Análise completa da presença online, plataformas de streaming, redes sociais e websites. Recomendações práticas para fortalecer o alcance do ministério de ensino e música.</p>
+  <div class="meta">
+    <div class="meta-item">📅 <span>Maio 2026</span></div>
+    <div class="meta-item">📋 <span>6 Sites Analisados</span></div>
+    <div class="meta-item">🌐 <span>7 Plataformas de Streaming</span></div>
+    <div class="meta-item">📱 <span>4 Redes Sociais</span></div>
+    <div class="meta-item">🎯 <span>20+ Recomendações</span></div>
+  </div>
+</header>
+
+<!-- SCORE -->
+<section class="score-section">
+  <div class="score-ring">
+    <svg width="280" height="280">
+      <circle class="bg-circle" cx="140" cy="140" r="120"></circle>
+      <circle class="progress-circle" cx="140" cy="140" r="120"></circle>
+    </svg>
+    <div class="score-inner">
+      <div class="num">70</div>
+      <div class="label">de 100</div>
+    </div>
+  </div>
+  <div class="score-details">
+    <h2>Score Geral: 70/100</h2>
+    <p>A presença digital da Nancy Hannah tem <strong>bases sólidas</strong> — conteúdo de qualidade, biografia rica e redes estabelecidas. As principais oportunidades estão em <strong>consolidar as plataformas de streaming</strong>, <strong>unificar a identidade visual</strong> e <strong>aumentar a frequência de publicações</strong>.</p>
+    <div class="score-bars">
+      <div class="score-bar-item">
+        <span class="bar-label">Streaming</span>
+        <div class="bar-track"><div class="bar-fill" style="width:90%;background:linear-gradient(90deg,#4facfe,#00f2fe);"></div></div>
+        <span class="bar-value">90%</span>
+      </div>
+      <div class="score-bar-item">
+        <span class="bar-label">Redes Sociais</span>
+        <div class="bar-track"><div class="bar-fill" style="width:65%;background:linear-gradient(90deg,#b388ff,#7c4dff);"></div></div>
+        <span class="bar-value">65%</span>
+      </div>
+      <div class="score-bar-item">
+        <span class="bar-label">Sites</span>
+        <div class="bar-track"><div class="bar-fill" style="width:85%;background:linear-gradient(90deg,#c9a87e,#d4a574);"></div></div>
+        <span class="bar-value">85%</span>
+      </div>
+      <div class="score-bar-item">
+        <span class="bar-label">Conteúdo</span>
+        <div class="bar-track"><div class="bar-fill" style="width:75%;background:linear-gradient(90deg,#ffb400,#ff8800);"></div></div>
+        <span class="bar-value">75%</span>
+      </div>
+      <div class="score-bar-item">
+        <span class="bar-label">Engajamento</span>
+        <div class="bar-track"><div class="bar-fill" style="width:45%;background:linear-gradient(90deg,#ff5050,#ff6b6b);"></div></div>
+        <span class="bar-value">45%</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NAV -->
+<nav class="report-nav">
+  <a href="#streaming">📡 Streaming</a>
+  <a href="#redes">📱 Redes Sociais</a>
+  <a href="#sites">🖥️ Sites</a>
+  <a href="#conteudo">📝 Conteúdo</a>
+  <a href="#prioridades">🎯 Prioridades</a>
+  <a href="#ranking">🏆 Ranking de Versões</a>
+</nav>
+
+<!-- STREAMING -->
+<section class="section" id="streaming">
+  <div class="section-header">
+    <div class="section-tag">Capítulo 1</div>
+    <h2 class="section-title">Plataformas de Streaming</h2>
+    <p class="section-desc">Análise da presença do EP "Nancy Hannah" nas plataformas digitais. Todas as plataformas já estão linkadas nos sites — agora é preciso garantir que estejam ativas e otimizadas.</p>
+  </div>
+
+  <table class="stream-table">
+    <thead>
+      <tr>
+        <th>Plataforma</th>
+        <th>Link</th>
+        <th>Perfil</th>
+        <th>Status</th>
+        <th>Prioridade</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="platform-icon">🎧</span> Spotify</td>
+        <td style="font-size:12px;color:#4facfe;">open.spotify.com/album/5h2aYVwg4mcNs5RAUnyaun</td>
+        <td>Artista verificada</td>
+        <td class="check-yes">✅ Ativo</td>
+        <td><span class="status-info">Média</span></td>
+      </tr>
+      <tr>
+        <td><span class="platform-icon">🍎</span> Apple Music</td>
+        <td style="font-size:12px;color:#4facfe;">music.apple.com/album/1715149871</td>
+        <td>Artista com perfil</td>
+        <td class="check-yes">✅ Ativo</td>
+        <td><span class="status-info">Média</span></td>
+      </tr>
+      <tr>
+        <td><span class="platform-icon">▶</span> Deezer</td>
+        <td style="font-size:12px;color:#4facfe;">deezer.com/album/509022631</td>
+        <td>Perfil básico</td>
+        <td class="check-yes">✅ Ativo</td>
+        <td><span class="status-warn">Média-Alta</span></td>
+      </tr>
+      <tr>
+        <td><span class="platform-icon">🌊</span> Tidal</td>
+        <td style="font-size:12px;color:#4facfe;">tidal.com/album/326971569</td>
+        <td>Perfil básico</td>
+        <td class="check-yes">✅ Ativo</td>
+        <td><span class="status-bad">Baixa</span></td>
+      </tr>
+      <tr>
+        <td><span class="platform-icon">📀</span> Amazon Music</td>
+        <td style="font-size:12px;color:#4facfe;">music.amazon.com/albums/B0CMMX8N76</td>
+        <td>Perfil básico</td>
+        <td class="check-yes">✅ Ativo</td>
+        <td><span class="status-info">Média</span></td>
+      </tr>
+      <tr>
+        <td><span class="platform-icon">▶</span> YouTube</td>
+        <td style="font-size:12px;color:#4facfe;">youtube.com/@NANCYHANNAH</td>
+        <td>6,3K inscritos</td>
+        <td class="check-yes">✅ Ativo</td>
+        <td><span class="status-good">Alta</span></td>
+      </tr>
+      <tr>
+        <td><span class="platform-icon">🔗</span> Linktree</td>
+        <td style="font-size:12px;color:#4facfe;">linktr.ee/nancyhannahoficial</td>
+        <td>Agregador de links</td>
+        <td class="check-partial">⚠️ Precisa atualizar</td>
+        <td><span class="status-good">Alta</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="insight-grid" style="margin-top:40px;">
+    <div class="insight-card">
+      <div class="problem">
+        <h4>⚠️ Problema</h4>
+        <p><strong>Linktree desatualizado</strong> — O Linktree atual (tinyurl.com/66w2xs85) aponta para uma versão antiga do OneRPM. É crucial atualizar com o link oficial <strong>onerpm.link/328303861070</strong> e adicionar links diretos para cada plataforma.</p>
+      </div>
+      <div class="solution">
+        <h4>✅ Solução</h4>
+        <p>Substituir o smart link do Linktree para refletir todas as plataformas. Idealmente, usar o <strong>linktr.ee/nancyhannahoficial</strong> já existente e configurar os botões para cada plataforma individualmente.</p>
+        <a href="https://linktr.ee/nancyhannahoficial" target="_blank" class="action-btn">🔗 Ver Linktree</a>
+      </div>
+    </div>
+    <div class="insight-card">
+      <div class="problem">
+        <h4>⚠️ Oportunidade</h4>
+        <p><strong>Playlists são o maior motor de descoberta</strong> — 70% dos streams no Spotify vêm de playlists. O EP precisa estar em playlists gospel curadas para ser descoberto por novos ouvintes.</p>
+      </div>
+      <div class="solution">
+        <h4>✅ Recomendação</h4>
+        <p>Submeter o EP para playlists editoriais do Spotify (Atualidade Gospel, Gospel Brasil, etc.) e playlists independentes. Criar uma <strong>playlist própria</strong> com as músicas do EP + referências para aumentar o tempo de audição.</p>
+      </div>
+    </div>
+    <div class="insight-card">
+      <div class="problem">
+        <h4>⚠️ Lacuna</h4>
+        <p><strong>YouTube com 6,3K inscritos mas sem clipes oficiais</strong> — O canal tem potencial mas precisa de conteúdo visual: lyric videos, clipes com imagens bíblicas, vídeos com a letra das músicas.</p>
+      </div>
+      <div class="solution">
+        <h4>✅ Ação Imediata</h4>
+        <p>Publicar <strong>lyric videos</strong> para cada faixa do EP (pode usar imagens com a letra sobrepondo). Isso aumenta o tempo de visualização, melhora o SEO do YouTube e atrai novos inscritos. Custo: praticamente zero com ferramentas gratuitas como Canva ou CapCut.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REDES SOCIAIS -->
+<section class="section" id="redes">
+  <div class="section-header">
+    <div class="section-tag">Capítulo 2</div>
+    <h2 class="section-title">Redes Sociais — Diagnóstico</h2>
+    <p class="section-desc">Cada rede social tem um papel diferente no crescimento do ministério. Abaixo, o raio-X completo com notas e recomendações específicas.</p>
+  </div>
+
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-header">
+        <span class="metric-icon">📷</span>
+        <span class="metric-name">Instagram @nancyhannahmusic</span>
+      </div>
+      <div class="metric-stat">14K</div>
+      <div class="metric-sub">Seguidores • Principal canal</div>
+      <span class="metric-status status-good">✅ Principal ativo</span>
+      <div style="margin-top:16px;font-size:13px;color:#8888aa;line-height:1.6;">
+        <strong>Pontos fortes:</strong> Maior base de seguidores, bom para anúncios e divulgação.<br>
+        <strong>Melhorar:</strong> Frequência de posts (ideal: 3-5x/semana), Stories diários, Reels com trechos das músicas.
+      </div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-header">
+        <span class="metric-icon">📷</span>
+        <span class="metric-name">Instagram @nancyhannahoficial</span>
+      </div>
+      <div class="metric-stat">346</div>
+      <div class="metric-sub">Seguidores • Conta secundária</div>
+      <span class="metric-status status-bad">🔴 Requer atenção</span>
+      <div style="margin-top:16px;font-size:13px;color:#8888aa;line-height:1.6;">
+        <strong>Problema:</strong> Duas contas dividem a audiência. 346 seguidores é muito baixo comparado aos 14K da principal.<br>
+        <strong>Recomendação:</strong> Unificar em uma só conta (a de 14K) ou redirecionar esta para a principal. Duas contas fragmentam o engajamento.
+      </div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-header">
+        <span class="metric-icon">🎵</span>
+        <span class="metric-name">TikTok @nancyhannahmusic</span>
+      </div>
+      <div class="metric-stat">24K</div>
+      <div class="metric-sub">Seguidores • Maior audiência</div>
+      <span class="metric-status status-good">🟢 Potencial enorme</span>
+      <div style="margin-top:16px;font-size:13px;color:#8888aa;line-height:1.6;">
+        <strong>Ponto forte:</strong> Maior base entre todas as redes! 24K seguidores é expressivo.<br>
+        <strong>Oportunidade:</strong> TikTok é a plataforma que mais cresce para música gospel. Postar bastidores, trechos de músicas, versículos cantados, dublagens. Ideal: 1-2 posts/dia.
+      </div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-header">
+        <span class="metric-icon">▶</span>
+        <span class="metric-name">YouTube @NANCYHANNAH</span>
+      </div>
+      <div class="metric-stat">6,3K</div>
+      <div class="metric-sub">Inscritos • Baixo engajamento</div>
+      <span class="metric-status status-warn">🟡 Precisa de conteúdo</span>
+      <div style="margin-top:16px;font-size:13px;color:#8888aa;line-height:1.6;">
+        <strong>Problema:</strong> Apenas 4 vídeos publicados. Com 6,3K inscritos, o canal está subutilizado.<br>
+        <strong>Ação:</strong> Publicar lyric videos do EP completo (5 músicas + 5 playbacks = 10 vídeos), criar playlists, postar mensagens semanais. YouTube é o segundo maior motor de busca do mundo.
+      </div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-header">
+        <span class="metric-icon">f</span>
+        <span class="metric-name">Facebook</span>
+      </div>
+      <div class="metric-stat">—</div>
+      <div class="metric-sub">Métricas não disponíveis</div>
+      <span class="metric-status status-warn">🟡 Potencial inexplorado</span>
+      <div style="margin-top:16px;font-size:13px;color:#8888aa;line-height:1.6;">
+        <strong>Contexto:</strong> Facebook ainda é relevante para o público gospel acima de 35 anos.<br>
+        <strong>Sugestão:</strong> Manter presença básica, compartilhar posts do Instagram automaticamente, focar esforços em Instagram e TikTok que têm mais retorno.
+      </div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-header">
+        <span class="metric-icon">🔗</span>
+        <span class="metric-name">Linktree</span>
+      </div>
+      <div class="metric-stat">1</div>
+      <div class="metric-sub">Página agregadora</div>
+      <span class="metric-status status-bad">🔴 Desatualizado</span>
+      <div style="margin-top:16px;font-size:13px;color:#8888aa;line-height:1.6;">
+        <strong>Problema crítico:</strong> O Linktree atual usa link encurtado (tinyurl) apontando para versão antiga do OneRPM. Não reflete as 7 plataformas agora disponíveis.<br>
+        <strong>Ação urgente:</strong> Atualizar com links diretos para cada plataforma de streaming.
+      </div>
+    </div>
+  </div>
+
+  <!-- REDES INSIGHTS -->
+  <div class="insight-grid" style="margin-top:32px;">
+    <div class="insight-card">
+      <div class="problem">
+        <h4>⚠️ Fragmentação de Instagram</h4>
+        <p>Duas contas no Instagram (@nancyhannahmusic com 14K e @nancyhannahoficial com 346) dividem a audiência. Isso prejudica o algoritmo, que entrega melhor para contas com maior densidade de seguidores e engajamento concentrado.</p>
+      </div>
+      <div class="solution">
+        <h4>✅ Unificar em @nancyhannahmusic</h4>
+        <p>Manter apenas a conta de 14K como oficial. Na conta de 346, publicar um aviso nos Stories e na bio redirecionando para a principal. O Instagram premia contas com seguidores concentrados — duas contas fracas performam pior que uma conta forte.</p>
+      </div>
+    </div>
+
+    <div class="insight-card">
+      <div class="problem">
+        <h4>⚠️ TikTok com 24K mas sem estratégia</h4>
+        <p>O TikTok é a maior base de seguidores (24K), mas não há evidência de uma estratégia ativa de conteúdo. O algoritmo do TikTok é o mais generoso para descoberta orgânica — qualquer vídeo pode viralizar independentemente do número de seguidores.</p>
+      </div>
+      <div class="solution">
+        <h4>✅ Estratégia TikTok</h4>
+        <p>Publicar 1-2 vídeos/dia: (1) trechos de 15-30s das músicas do EP com a letra na tela, (2) dublagens simples, (3) bastidores do ministério, (4) versículos musicados. Usar hashtags: #gospel #nancyhannah #musicagospel #adoração. TikTok é a plataforma que mais cresce no Brasil.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALENDÁRIO SUGERIDO -->
+  <div style="margin-top:48px;">
+    <h3 style="font-family:'Playfair Display',serif;font-size:24px;color:#f0f0ff;margin-bottom:16px;">📅 Calendário Semanal Sugerido</h3>
+    <table class="stream-table">
+      <thead>
+        <tr><th>Dia</th><th>Instagram</th><th>TikTok</th><th>YouTube</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Segunda</td><td>Versículo do dia (Card)</td><td>Trecho de música</td><td>—</td></tr>
+        <tr><td>Terça</td><td>Bastidores / Foto do dia</td><td>Dublagem</td><td>—</td></tr>
+        <tr><td>Quarta</td><td>Quiz bíblico (Stories)</td><td>Versículo cantado</td><td>—</td></tr>
+        <tr><td>Quinta</td><td>Trecho do EP (Reels)</td><td>Trecho de música</td><td>—</td></tr>
+        <tr><td>Sexta</td><td>Testemunho / Citação</td><td>Dublagem</td><td>—</td></tr>
+        <tr><td>Sábado</td><td>Agenda / Programação</td><td>Bastidores</td><td>—</td></tr>
+        <tr><td>Domingo</td><td>Versículo + música</td><td>Versículo cantado</td><td>Lyric video semanal</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:16px;font-size:14px;color:#8888aa;">⏰ <strong>Tempo estimado:</strong> 15-20 min/dia para criar e publicar conteúdo em todas as plataformas.</p>
+  </div>
+</section>
+
+<!-- SITES -->
+<section class="section" id="sites">
+  <div class="section-header">
+    <div class="section-tag">Capítulo 3</div>
+    <h2 class="section-title">Websites — Protótipos em Análise</h2>
+    <p class="section-desc">Abaixo, os <strong>projetos dos sites</strong> que estamos desenvolvendo para Nancy. São 6 protótipos (3 para Missionária Nancy + 3 para Nancy Hannah Cantora), cada um com um estilo visual distinto. <strong>Este relatório documenta nossa conversa sobre qual direção seguir</strong> — as capturas de tela mostram exatamente como cada versão está neste momento. <strong>Nota:</strong> os placeholders (🎤, ✝️) serão substituídos pelas fotos que Nancy enviar.</p>
+  </div>
+
+  <div class="design-grid">
+    <!-- MN v1 -->
+    <div class="design-card">
+      <div class="preview" style="background-image:url('screenshots/mn-v1.png');background-size:cover;background-position:top;">
+        <div class="overlay">
+          <div class="v-name">Missionária Nancy</div>
+          <div class="v-sub">Dark Gold Clássico</div>
+        </div>
+      </div>
+      <div class="info">
+        <span class="v-style">🏆 Recomendado</span>
+        <h4>Versão 1 — Dark Gold</h4>
+        <p>Estilo sóbrio e elegante. Paleta escura com detalhes dourados. Transmite solenidade e profundidade bíblica.</p>
+        <div class="rating">
+          <span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span>
+        </div>
+        <div style="margin-top:8px;font-size:13px;color:#8888aa;">
+          <strong>Melhor para:</strong> Quem busca um site com presença forte, que comunica autoridade espiritual sem perder a elegância.
+        </div>
+      </div>
+    </div>
+
+    <!-- MN v2 -->
+    <div class="design-card">
+      <div class="preview" style="background-image:url('screenshots/mn-v2.png');background-size:cover;background-position:top;">
+        <div class="overlay">
+          <div class="v-name">Missionária Nancy</div>
+          <div class="v-sub">Warm Creme Premium</div>
+        </div>
+      </div>
+      <div class="info">
+        <span class="v-style">Boa Opção</span>
+        <h4>Versão 2 — Creme Premium</h4>
+        <p>Estilo claro e acolhedor. Fundo creme com detalhes em marrom. Transmite calor humano e sofisticação.</p>
+        <div class="rating">
+          <span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-empty">★</span>
+        </div>
+        <div style="margin-top:8px;font-size:13px;color:#8888aa;">
+          <strong>Melhor para:</strong> Público que prefere sites claros, leves, com aparência de revista digital.
+        </div>
+      </div>
+    </div>
+
+    <!-- MN v3 -->
+    <div class="design-card">
+      <div class="preview" style="background-image:url('screenshots/mn-v3.png');background-size:cover;background-position:top;">
+        <div class="overlay">
+          <div class="v-name">Missionária Nancy</div>
+          <div class="v-sub">Dark Bold com Versículo</div>
+        </div>
+      </div>
+      <div class="info">
+        <span class="v-style">Estilo Impactante</span>
+        <h4>Versão 3 — Bold Dark</h4>
+        <p>Split-screen com foto de um lado e biografia do outro. Versículo bíblico em destaque no hero. Design mais dramático.</p>
+        <div class="rating">
+          <span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-empty">★</span>
+        </div>
+        <div style="margin-top:8px;font-size:13px;color:#8888aa;">
+          <strong>Melhor para:</strong> Causar impacto visual imediato. Ótimo para apresentação inicial, mas pode cansar em navegação longa.
+        </div>
+      </div>
+    </div>
+
+    <!-- NH v1 -->
+    <div class="design-card">
+      <div class="preview" style="background-image:url('screenshots/nh-v1.png');background-size:cover;background-position:top;">
+        <div class="overlay">
+          <div class="v-name">Nancy Hannah</div>
+          <div class="v-sub">Dark Azul Cobalto</div>
+        </div>
+      </div>
+      <div class="info">
+        <span class="v-style">🏆 Recomendado</span>
+        <h4>Versão 1 — Azul Cobalto</h4>
+        <p>Design escuro com gradientes azuis. Partículas animadas no hero. Stats grandes (6,3K / 14K / 24K). Profissional e moderno.</p>
+        <div class="rating">
+          <span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span>
+        </div>
+        <div style="margin-top:8px;font-size:13px;color:#8888aa;">
+          <strong>Melhor para:</strong> Artista que quer mostrar números e credibilidade. O mais completo em termos de informações.
+        </div>
+      </div>
+    </div>
+
+    <!-- NH v2 -->
+    <div class="design-card">
+      <div class="preview" style="background-image:url('screenshots/nh-v2.png');background-size:cover;background-position:top;">
+        <div class="overlay">
+          <div class="v-name">Nancy Hannah</div>
+          <div class="v-sub">Purple Vibrante</div>
+        </div>
+      </div>
+      <div class="info">
+        <span class="v-style">Boa Opção</span>
+        <h4>Versão 2 — Purple Vibrante</h4>
+        <p>Gradiente roxo com navegação fixa. Cards de estatísticas no estilo painel. Visual moderno e arrojado.</p>
+        <div class="rating">
+          <span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-empty">★</span>
+        </div>
+        <div style="margin-top:8px;font-size:13px;color:#8888aa;">
+          <strong>Melhor para:</strong> Público mais jovem. Design vibrante que se destaca. Menos formal que o azul cobalto.
+        </div>
+      </div>
+    </div>
+
+    <!-- NH v3 -->
+    <div class="design-card">
+      <div class="preview" style="background-image:url('screenshots/nh-v3.png');background-size:cover;background-position:top;">
+        <div class="overlay">
+          <div class="v-name">Nancy Hannah</div>
+          <div class="v-sub">Branco Minimalista</div>
+        </div>
+      </div>
+      <div class="info">
+        <span class="v-style">Estilo Premium</span>
+        <h4>Versão 3 — Branco Minimalista</h4>
+        <p>Design limpo, tipografia serifada, espaços amplos. Estilo "artista internacional". Sofisticado e atemporal.</p>
+        <div class="rating">
+          <span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-empty">★</span>
+        </div>
+        <div style="margin-top:8px;font-size:13px;color:#8888aa;">
+          <strong>Melhor para:</strong> Artista que quer um site "limpo" que funciona como portfólio. Excelente para enviar para gravadoras e produtores.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="insight-card alt" style="margin-top:32px;">
+    <div class="problem">
+      <h4>💡 Em Discussão com Nancy</h4>
+      <p>Estes são os protótipos que estamos analisando juntos. Abaixo, uma sugestão inicial de preferência:<br><br>
+      <strong>Missionária Nancy:</strong> Versão 1 (Dark Gold) — transmite a solenidade do ministério de ensino, é a mais equilibrada entre elegância e legibilidade.<br><br>
+      <strong>Nancy Hannah Cantora:</strong> Versão 1 (Azul Cobalto) — a mais completa em informações, stats grandes que impressionam, design moderno sem perder a seriedade do ministério gospel.<br><br>
+      <strong>Alternativa:</strong> Se preferir um visual mais leve, a combinação MN v2 (Creme) + NH v3 (Branco) também funciona muito bem como par.<br><br>
+      📸 <strong>As imagens acima são capturas reais dos protótipos atuais.</strong> Os placeholders (🎤, ✝️) serão substituídos pelas fotos que Nancy escolher.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CONTEÚDO -->
+<section class="section" id="conteudo">
+  <div class="section-header">
+    <div class="section-tag">Capítulo 4</div>
+    <h2 class="section-title">Melhorias de Conteúdo</h2>
+    <p class="section-desc">O conteúdo é o coração da presença digital. Abaixo, as lacunas identificadas e como preenchê-las com ações práticas de baixo custo.</p>
+  </div>
+
+  <div class="rec-list">
+    <div class="rec-item priority-high">
+      <div class="rec-priority">1</div>
+      <div class="rec-text">
+        <h4>Fotos Profissionais</h4>
+        <p>Substituir os placeholders (🎤, ✝️) por fotos reais de alta qualidade. Isso é o que mais impacta a credibilidade do site.</p>
+        <span class="rec-why">🎯 Por quê: 67% dos usuários julgam a credibilidade de um site pelo design e pelas fotos. Placeholders transmitem "obra inacabada".</span>
+      </div>
+    </div>
+
+    <div class="rec-item priority-high">
+      <div class="rec-priority">2</div>
+      <div class="rec-text">
+        <h4>Lyric Videos no YouTube</h4>
+        <p>Publicar lyric videos para cada uma das 5 músicas do EP. Custo zero (Canva ou CapCut), retorno alto em descoberta e engajamento.</p>
+        <span class="rec-why">🎯 Por quê: YouTube é o segundo maior buscador do mundo. Vídeos com letra são os mais buscados por quem quer aprender a cantar a música.</span>
+      </div>
+    </div>
+
+    <div class="rec-item priority-high">
+      <div class="rec-priority">3</div>
+      <div class="rec-text">
+        <h4>Linktree Atualizado</h4>
+        <p>Configurar o Linktree com links diretos para TODAS as plataformas de streaming. É a porta de entrada para novos fãs.</p>
+        <span class="rec-why">🎯 Por quê: 80% dos acessos a links de artistas vêm de agregadores como Linktree. Se está desatualizado, o fã não encontra a música.</span>
+      </div>
+    </div>
+
+    <div class="rec-item priority-medium">
+      <div class="rec-priority">4</div>
+      <div class="rec-text">
+        <h4>Unificar Instagram</h4>
+        <p>Manter apenas @nancyhannahmusic (14K) como conta oficial. Redirecionar @nancyhannahoficial (346) para a principal.</p>
+        <span class="rec-why">🎯 Por quê: O algoritmo do Instagram entrega melhor para contas com seguidores concentrados. Duas contas pequenas competem entre si.</span>
+      </div>
+    </div>
+
+    <div class="rec-item priority-medium">
+      <div class="rec-priority">5</div>
+      <div class="rec-text">
+        <h4>Estratégia TikTok</h4>
+        <p>Criar rotina de 1-2 posts/dia no TikTok. É a plataforma com MAIOR base de seguidores (24K) e a que mais cresce no Brasil.</p>
+        <span class="rec-why">🎯 Por quê: TikTok tem o alcance orgânico mais generoso. 24K seguidores é uma base excelente para começar a viralizar.</span>
+      </div>
+    </div>
+
+    <div class="rec-item priority-medium">
+      <div class="rec-priority">6</div>
+      <div class="rec-text">
+        <h4>SEO dos Sites</h4>
+        <p>Adicionar meta tags de descrição, Open Graph (para compartilhamento em redes sociais) e palavras-chave nos sites.</p>
+        <span class="rec-why">🎯 Por quê: Quando alguém compartilha o link no WhatsApp, a prévia com imagem e descrição aumenta em 3x a chance de clique.</span>
+      </div>
+    </div>
+
+    <div class="rec-item priority-low">
+      <div class="rec-priority">7</div>
+      <div class="rec-text">
+        <h4>E-mail Profissional</h4>
+        <p>Substituir nancyhannah@email.com por contato@nancyhannah.com.br ou booking@nancyhannah.com.br.</p>
+        <span class="rec-why">🎯 Por quê: E-mails profissionais aumentam a taxa de resposta de contratantes e igrejas em até 40%.</span>
+      </div>
+    </div>
+
+    <div class="rec-item priority-low">
+      <div class="rec-priority">8</div>
+      <div class="rec-text">
+        <h4>Depoimentos</h4>
+        <p>Adicionar depoimentos de líderes e pastores sobre o ministério de Nancy. Isso constrói prova social.</p>
+        <span class="rec-why">🎯 Por quê: 92% dos visitantes confiam mais em um site que tem depoimentos de terceiros (Nielsen).</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRIORIDADES -->
+<section class="section" id="prioridades">
+  <div class="section-header">
+    <div class="section-tag">Capítulo 5</div>
+    <h2 class="section-title">Matriz de Prioridades</h2>
+    <p class="section-desc">Organizado por impacto vs. esforço. Faça primeiro o que traz mais resultado com menos trabalho.</p>
+  </div>
+
+  <div class="matrix-grid">
+    <div class="matrix-quadrant quad-do-first">
+      <h4>✅ Faça Primeiro (Alto Impacto, Baixo Esforço)</h4>
+      <ul>
+        <li><span class="quad-icon">📸</span> Substituir placeholders por fotos reais</li>
+        <li><span class="quad-icon">🔗</span> Atualizar Linktree com todos os links</li>
+        <li><span class="quad-icon">🎬</span> Publicar 1 lyric video no YouTube</li>
+        <li><span class="quad-icon">📱</span> Unificar Instagram em 1 conta</li>
+        <li><span class="quad-icon">📋</span> Adicionar meta tags SEO nos sites</li>
+      </ul>
+    </div>
+
+    <div class="matrix-quadrant quad-schedule">
+      <h4>📅 Agende (Alto Impacto, Alto Esforço)</h4>
+      <ul>
+        <li><span class="quad-icon">🎥</span> Clipe musical profissional</li>
+        <li><span class="quad-icon">📧</span> E-mail profissional + domínio próprio</li>
+        <li><span class="quad-icon">📱</span> Rotina de posts no TikTok (1-2/dia)</li>
+        <li><span class="quad-icon">📖</span> Playlists no Spotify</li>
+      </ul>
+    </div>
+
+    <div class="matrix-quadrant quad-delegate">
+      <h4>👥 Delegue (Baixo Impacto, Baixo Esforço)</h4>
+      <ul>
+        <li><span class="quad-icon">📊</span> Agendador de posts (Buffer/Later)</li>
+        <li><span class="quad-icon">🎨</span> Template de artes no Canva</li>
+        <li><span class="quad-icon">📝</span> Calendário editorial semanal</li>
+      </ul>
+    </div>
+
+    <div class="matrix-quadrant quad-eliminate">
+      <h4>🗑️ Elimine ou Evite (Baixo Impacto, Alto Esforço)</h4>
+      <ul>
+        <li><span class="quad-icon">❌</span> Manter duas contas de Instagram</li>
+        <li><span class="quad-icon">❌</span> Postar em todas as redes ao mesmo tempo sem estratégia</li>
+        <li><span class="quad-icon">❌</span> Investir em anúncios pagos antes de ter conteúdo orgânico consistente</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- RANKING -->
+<section class="section" id="ranking">
+  <div class="section-header">
+    <div class="section-tag">Capítulo 6</div>
+    <h2 class="section-title">Ranking Final de Versões</h2>
+    <p class="section-desc">Baseado na análise completa, esta é a sugestão inicial de qual versão de cada site faz mais sentido como site principal. A decisão final, claro, é da Nancy após ver os protótipos.</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;">
+    <div style="background:linear-gradient(145deg,#12121e,#1a1a2e);border:1px solid rgba(79,172,254,0.06);border-radius:20px;padding:36px;">
+      <h3 style="font-family:'Playfair Display',serif;font-size:24px;color:#f0e8dc;margin-bottom:16px;">📜 Missionária Nancy</h3>
+      <div style="display:flex;gap:12px;flex-direction:column;">
+        <div style="display:flex;align-items:center;gap:12px;padding:16px;background:rgba(0,200,80,0.04);border-radius:12px;border:1px solid rgba(0,200,80,0.1);">
+          <span style="font-size:24px;">🥇</span>
+          <div>
+            <strong style="color:#00c850;">Versão 1 — Dark Gold</strong>
+            <div style="font-size:13px;color:#8888aa;">Sóbrio, elegante, transmite autoridade espiritual. Melhor equilíbrio entre design e conteúdo.</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:16px;background:rgba(79,172,254,0.04);border-radius:12px;border:1px solid rgba(79,172,254,0.1);">
+          <span style="font-size:24px;">🥈</span>
+          <div>
+            <strong style="color:#4facfe;">Versão 2 — Creme Premium</strong>
+            <div style="font-size:13px;color:#8888aa;">Claro e acolhedor. Ótimo para quem prefere sites claros.</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:16px;background:rgba(255,180,0,0.04);border-radius:12px;border:1px solid rgba(255,180,0,0.1);">
+          <span style="font-size:24px;">🥉</span>
+          <div>
+            <strong style="color:#ffb400;">Versão 3 — Bold Dark</strong>
+            <div style="font-size:13px;color:#8888aa;">Impactante para apresentação, mas pode ser pesado para navegação contínua.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:linear-gradient(145deg,#12121e,#1a1a2e);border:1px solid rgba(79,172,254,0.06);border-radius:20px;padding:36px;">
+      <h3 style="font-family:'Playfair Display',serif;font-size:24px;color:#f0e8dc;margin-bottom:16px;">🎤 Nancy Hannah Cantora</h3>
+      <div style="display:flex;gap:12px;flex-direction:column;">
+        <div style="display:flex;align-items:center;gap:12px;padding:16px;background:rgba(0,200,80,0.04);border-radius:12px;border:1px solid rgba(0,200,80,0.1);">
+          <span style="font-size:24px;">🥇</span>
+          <div>
+            <strong style="color:#00c850;">Versão 1 — Azul Cobalto</strong>
+            <div style="font-size:13px;color:#8888aa;">Mais completo, stats grandes, design moderno. O melhor para causar impressão profissional.</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:16px;background:rgba(79,172,254,0.04);border-radius:12px;border:1px solid rgba(79,172,254,0.1);">
+          <span style="font-size:24px;">🥈</span>
+          <div>
+            <strong style="color:#4facfe;">Versão 3 — Branco Minimalista</strong>
+            <div style="font-size:13px;color:#8888aa;">Design premium tipo "artista internacional". Ideal para gravadoras.</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:16px;background:rgba(255,180,0,0.04);border-radius:12px;border:1px solid rgba(255,180,0,0.1);">
+          <span style="font-size:24px;">🥉</span>
+          <div>
+            <strong style="color:#ffb400;">Versão 2 — Purple Vibrante</strong>
+            <div style="font-size:13px;color:#8888aa;">Moderno e arrojado, mas o roxo pode não agradar todos os públicos.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="insight-card alt" style="margin-top:32px;">
+    <div class="problem">
+      <h4>📌 Resumo Final</h4>
+      <p style="font-size:16px;line-height:1.9;color:#c0c0d0;">
+        <strong>Sugestão para subir ao GitHub Pages:</strong> <span style="color:#4facfe;">missionaria-nancy/index.html (v1)</span> + <span style="color:#4facfe;">nancy-hannah/index.html (v1)</span> como sites principais.<br>
+        <strong>Manter como backup:</strong> As demais versões podem ficar em subpastas (v2.html, v3.html) para referência.<br>
+        <strong>Próximo passo (após Nancy decidir):</strong> Substituir placeholders por fotos, configurar domínio próprio e e-mail profissional.<br>
+        <strong>Lembrar:</strong> O site é a <em>casa digital</em> do ministério. Redes sociais são alugadas — o site é próprio. Invista nele.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="report-footer">
+  <p>© 2026 — <span>Auditoria Profissional Nancy Hannah</span> • Relatório Confidencial</p>
+  <p>Produzido para <span>Nancy Aparecida Machado</span> • Soli Deo Gloria</p>
+</footer>
+
+</body>
+</html>
