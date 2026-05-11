@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auditoria de Redes — Nancy Hannah</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0f0f1a;
+    color: #e0e0e0;
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+  }
+  .container { max-width: 1200px; width: 100%; }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+    border-radius: 20px;
+    padding: 40px 50px;
+    margin-bottom: 40px;
+    border: 1px solid rgba(255,255,255,0.06);
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -50%; right: -20%;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(79,172,254,0.08) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .header-content { position: relative; z-index: 1; }
+  .header-badge {
+    display: inline-block;
+    background: rgba(79,172,254,0.15);
+    color: #4facfe;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid rgba(79,172,254,0.2);
+    margin-bottom: 16px;
+  }
+  .header h1 {
+    font-size: 42px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #fff 0%, #4facfe 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+  .header .subtitle {
+    font-size: 18px;
+    color: #8899aa;
+    font-weight: 300;
+  }
+  .header .date {
+    margin-top: 12px;
+    font-size: 13px;
+    color: #556677;
+  }
+  .header .date span { color: #4facfe; }
+
+  /* SCORE CARD */
+  .score-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 40px;
+  }
+  .score-card {
+    background: linear-gradient(135deg, #1a1a2e, #1e1e36);
+    border-radius: 16px;
+    padding: 30px;
+    border: 1px solid rgba(255,255,255,0.05);
+    text-align: center;
+  }
+  .score-card .number {
+    font-size: 56px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .score-card .label {
+    font-size: 14px;
+    color: #8899aa;
+    margin-top: 4px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .score-card .desc {
+    font-size: 13px;
+    color: #667788;
+    margin-top: 12px;
+    line-height: 1.6;
+  }
+  .score-bar {
+    margin-top: 20px;
+    height: 8px;
+    background: #2a2a44;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .score-bar .fill {
+    height: 100%;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #4facfe, #00f2fe);
+    transition: width 1s ease;
+  }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-title .line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(79,172,254,0.3), transparent);
+  }
+
+  /* PLATFORM GRID */
+  .platform-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-bottom: 50px;
+  }
+  .platform-card {
+    background: #1a1a2e;
+    border-radius: 16px;
+    padding: 28px;
+    border: 1px solid rgba(255,255,255,0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .platform-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+  }
+  .platform-card .platform-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .platform-card .platform-header .icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+  }
+  .yt-icon { background: rgba(255,0,0,0.15); }
+  .ig-icon { background: rgba(228,64,95,0.15); }
+  .tt-icon { background: rgba(0,0,0,0.3); }
+  .fb-icon { background: rgba(24,119,242,0.15); }
+  .sp-icon { background: rgba(30,215,96,0.15); }
+  .am-icon { background: rgba(255,45,85,0.15); }
+
+  .platform-card .platform-header .name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+  }
+  .platform-card .platform-header .handle {
+    font-size: 13px;
+    color: #667788;
+  }
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-row .stat-label { font-size: 13px; color: #8899aa; }
+  .stat-row .stat-value { font-size: 14px; font-weight: 600; color: #fff; }
+  .stat-row .stat-value.positive { color: #4facfe; }
+  .stat-row .stat-value.warning { color: #f7b731; }
+  .stat-row .stat-value.danger { color: #fc5c65; }
+
+  /* HEALTH BAR */
+  .health-section { margin-top: 18px; }
+  .health-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+  .health-label span:first-child { color: #8899aa; }
+  .health-label span:last-child { font-weight: 700; }
+  .health-bar {
+    height: 6px;
+    background: #2a2a44;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .health-bar .fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 1s ease;
+  }
+  .fill-green { background: linear-gradient(90deg, #26de81, #20bf6b); }
+  .fill-yellow { background: linear-gradient(90deg, #f7b731, #f0932b); }
+  .fill-red { background: linear-gradient(90deg, #fc5c65, #eb3b5a); }
+  .fill-blue { background: linear-gradient(90deg, #4facfe, #00f2fe); }
+
+  /* RECOMMENDATIONS */
+  .rec-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 20px;
+    margin-bottom: 50px;
+  }
+  .rec-card {
+    background: #1a1a2e;
+    border-radius: 14px;
+    padding: 24px;
+    border-left: 4px solid #4facfe;
+    border: 1px solid rgba(255,255,255,0.05);
+    border-left-width: 4px;
+  }
+  .rec-card.priority-high { border-left-color: #fc5c65; }
+  .rec-card.priority-mid { border-left-color: #f7b731; }
+  .rec-card.priority-low { border-left-color: #26de81; }
+  .rec-card .rec-platform {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #4facfe;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .rec-card h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #fff;
+  }
+  .rec-card p {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #8899aa;
+  }
+  .rec-card .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 12px;
+    margin-top: 10px;
+  }
+  .tag-high { background: rgba(252,92,101,0.15); color: #fc5c65; }
+  .tag-mid { background: rgba(247,183,49,0.15); color: #f7b731; }
+  .tag-low { background: rgba(38,222,129,0.15); color: #26de81; }
+
+  /* CHARTS */
+  .chart-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 50px;
+  }
+  .chart-card {
+    background: #1a1a2e;
+    border-radius: 16px;
+    padding: 28px;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+  .chart-card h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #fff;
+  }
+  .chart-card canvas { max-height: 280px; }
+
+  /* PRESENCE TABLE */
+  .presence-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 50px;
+    background: #1a1a2e;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+  .presence-table th {
+    background: #16213e;
+    padding: 16px 20px;
+    text-align: left;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #667788;
+    font-weight: 600;
+  }
+  .presence-table td {
+    padding: 14px 20px;
+    font-size: 14px;
+    border-top: 1px solid rgba(255,255,255,0.04);
+  }
+  .presence-table td:first-child { font-weight: 600; color: #fff; }
+  .status-yes { color: #26de81; }
+  .status-no { color: #fc5c65; }
+  .status-partial { color: #f7b731; }
+
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    padding: 30px;
+    color: #445566;
+    font-size: 13px;
+    border-top: 1px solid rgba(255,255,255,0.04);
+  }
+
+  @media (max-width: 768px) {
+    body { padding: 16px; }
+    .header { padding: 24px; }
+    .header h1 { font-size: 28px; }
+    .score-row { grid-template-columns: 1fr; }
+    .chart-row { grid-template-columns: 1fr; }
+    .rec-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-content">
+      <div class="header-badge">Relatório de Auditoria</div>
+      <h1>Auditoria de Redes<br>Nancy Hannah</h1>
+      <p class="subtitle">Análise completa de presença digital &mdash; métricas, engajamento e recomendações</p>
+      <p class="date">Gerado em <span id="dataAtual"></span> &bull; Dados coletados via busca profunda</p>
+    </div>
+  </div>
+
+  <!-- SCORE -->
+  <div class="score-row">
+    <div class="score-card">
+      <div class="number">53</div>
+      <div class="label">Pontuação Geral</div>
+      <div class="desc">Presença digital mediana. Base de fãs nichada crescendo, mas falta consistência e estratégia unificada entre plataformas.</div>
+      <div class="score-bar"><div class="fill" style="width:53%"></div></div>
+    </div>
+    <div class="score-card">
+      <div class="number">6</div>
+      <div class="label">Plataformas Ativas</div>
+      <div class="desc">YouTube, Instagram (x2), TikTok, Facebook, Spotify, Apple Music &mdash; mas com qualidade e frequência de postagem irregulares.</div>
+      <div class="score-bar"><div class="fill" style="width:60%"></div></div>
+    </div>
+  </div>
+
+  <!-- PLATFORMS -->
+  <div class="section-title">
+    Diagnóstico por Plataforma
+    <span class="line"></span>
+  </div>
+
+  <div class="platform-grid" id="platformGrid">
+
+    <!-- YOUTUBE -->
+    <div class="platform-card">
+      <div class="platform-header">
+        <div class="icon yt-icon">▶</div>
+        <div>
+          <div class="name">YouTube</div>
+          <div class="handle">@NANCYHANNAH</div>
+        </div>
+      </div>
+      <div class="stat-row"><span class="stat-label">Inscritos</span><span class="stat-value">6.300</span></div>
+      <div class="stat-row"><span class="stat-label">Vídeos</span><span class="stat-value">40</span></div>
+      <div class="stat-row"><span class="stat-label">Média de views</span><span class="stat-value warning">~500 / vídeo</span></div>
+      <div class="stat-row"><span class="stat-label">Frequência</span><span class="stat-value danger">Irregular</span></div>
+      <div class="health-section">
+        <div class="health-label"><span>Saúde do canal</span><span>40%</span></div>
+        <div class="health-bar"><div class="fill fill-red" style="width:40%"></div></div>
+      </div>
+    </div>
+
+    <!-- INSTAGRAM PRINCIPAL -->
+    <div class="platform-card">
+      <div class="platform-header">
+        <div class="icon ig-icon">📷</div>
+        <div>
+          <div class="name">Instagram (Principal)</div>
+          <div class="handle">@nancyhannahmusic</div>
+        </div>
+      </div>
+      <div class="stat-row"><span class="stat-label">Seguidores</span><span class="stat-value">14.000</span></div>
+      <div class="stat-row"><span class="stat-label">Seguindo</span><span class="stat-value">1.352</span></div>
+      <div class="stat-row"><span class="stat-label">Posts</span><span class="stat-value">119</span></div>
+      <div class="stat-row"><span class="stat-label">Relação seg/sig</span><span class="stat-value warning">10:1 (segue muito)</span></div>
+      <div class="health-section">
+        <div class="health-label"><span>Saúde do perfil</span><span>65%</span></div>
+        <div class="health-bar"><div class="fill fill-yellow" style="width:65%"></div></div>
+      </div>
+    </div>
+
+    <!-- INSTAGRAM SECUNDÁRIO -->
+    <div class="platform-card">
+      <div class="platform-header">
+        <div class="icon ig-icon">📷</div>
+        <div>
+          <div class="name">Instagram (Secundário)</div>
+          <div class="handle">@nancyhannahoficial</div>
+        </div>
+      </div>
+      <div class="stat-row"><span class="stat-label">Seguidores</span><span class="stat-value">346</span></div>
+      <div class="stat-row"><span class="stat-label">Seguindo</span><span class="stat-value">930</span></div>
+      <div class="stat-row"><span class="stat-label">Posts</span><span class="stat-value">56</span></div>
+      <div class="stat-row"><span class="stat-label">Relação seg/sig</span><span class="stat-value danger">Invertida (0.4:1)</span></div>
+      <div class="health-section">
+        <div class="health-label"><span>Saúde do perfil</span><span>15%</span></div>
+        <div class="health-bar"><div class="fill fill-red" style="width:15%"></div></div>
+      </div>
+    </div>
+
+    <!-- TIKTOK -->
+    <div class="platform-card">
+      <div class="platform-header">
+        <div class="icon tt-icon">🎵</div>
+        <div>
+          <div class="name">TikTok</div>
+          <div class="handle">@nancyhannahoficial</div>
+        </div>
+      </div>
+      <div class="stat-row"><span class="stat-label">Seguidores</span><span class="stat-value">24.000</span></div>
+      <div class="stat-row"><span class="stat-label">Curtidas</span><span class="stat-value">60.200</span></div>
+      <div class="stat-row"><span class="stat-label">Relação curtidas/seg</span><span class="stat-value positive">2,5 por seguidor</span></div>
+      <div class="stat-row"><span class="stat-label">Crescimento</span><span class="stat-value positive">Alto potencial</span></div>
+      <div class="health-section">
+        <div class="health-label"><span>Saúde do perfil</span><span>75%</span></div>
+        <div class="health-bar"><div class="fill fill-green" style="width:75%"></div></div>
+      </div>
+    </div>
+
+    <!-- FACEBOOK -->
+    <div class="platform-card">
+      <div class="platform-header">
+        <div class="icon fb-icon">f</div>
+        <div>
+          <div class="name">Facebook</div>
+          <div class="handle">Nancy Hannah</div>
+        </div>
+      </div>
+      <div class="stat-row"><span class="stat-label">Seguidores</span><span class="stat-value">~500 (estimado)</span></div>
+      <div class="stat-row"><span class="stat-label">Último post</span><span class="stat-value warning">Mai 2025</span></div>
+      <div class="stat-row"><span class="stat-label">Frequência</span><span class="stat-value danger">Abandonado</span></div>
+      <div class="stat-row"><span class="stat-label">Engajamento</span><span class="stat-value danger">Baixíssimo</span></div>
+      <div class="health-section">
+        <div class="health-label"><span>Saúde do perfil</span><span>10%</span></div>
+        <div class="health-bar"><div class="fill fill-red" style="width:10%"></div></div>
+      </div>
+    </div>
+
+    <!-- SPOTIFY -->
+    <div class="platform-card">
+      <div class="platform-header">
+        <div class="icon sp-icon">🎧</div>
+        <div>
+          <div class="name">Spotify</div>
+          <div class="handle">Nancy Hannah</div>
+        </div>
+      </div>
+      <div class="stat-row"><span class="stat-label">Músicas</span><span class="stat-value">8+ (com karaokês)</span></div>
+      <div class="stat-row"><span class="stat-label">Álbuns/EPs</span><span class="stat-value">1 EP + 4 singles</span></div>
+      <div class="stat-row"><span class="stat-label">Produtora</span><span class="stat-value">Religar Records</span></div>
+      <div class="stat-row"><span class="stat-label">Distribuição</span><span class="stat-value positive">Warner Chappell</span></div>
+      <div class="health-section">
+        <div class="health-label"><span>Saúde do perfil</span><span>60%</span></div>
+        <div class="health-bar"><div class="fill fill-yellow" style="width:60%"></div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CHARTS -->
+  <div class="section-title">
+    Métricas Comparativas
+    <span class="line"></span>
+  </div>
+
+  <div class="chart-row">
+    <div class="chart-card">
+      <h3>Seguidores por Plataforma</h3>
+      <canvas id="chartFollowers"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>Saúde Geral por Plataforma (%)</h3>
+      <canvas id="chartHealth"></canvas>
+    </div>
+  </div>
+
+  <!-- PRESENCE TABLE -->
+  <div class="section-title">
+    Matriz de Presença Digital
+    <span class="line"></span>
+  </div>
+
+  <table class="presence-table">
+    <thead>
+      <tr>
+        <th>Critério</th>
+        <th>YouTube</th>
+        <th>Instagram (Pri.)</th>
+        <th>Instagram (Sec.)</th>
+        <th>TikTok</th>
+        <th>Facebook</th>
+        <th>Spotify</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Perfil vinculado ao Linktree</td>
+        <td class="status-yes">Sim</td>
+        <td class="status-yes">Sim</td>
+        <td class="status-yes">Sim</td>
+        <td class="status-yes">Sim</td>
+        <td class="status-yes">Sim</td>
+        <td class="status-no">Não</td>
+      </tr>
+      <tr>
+        <td>Bio otimizada com CTA</td>
+        <td class="status-partial">Parcial</td>
+        <td class="status-yes">Sim</td>
+        <td class="status-yes">Sim</td>
+        <td class="status-partial">Parcial</td>
+        <td class="status-no">Não</td>
+        <td class="status-partial">Parcial</td>
+      </tr>
+      <tr>
+        <td>Frequência de posts (semanal)</td>
+        <td class="status-no">&lt;1</td>
+        <td class="status-partial">1-2</td>
+        <td class="status-no">&lt;1</td>
+        <td class="status-partial">1-2</td>
+        <td class="status-no">0</td>
+        <td class="status-yes">N/A</td>
+      </tr>
+      <tr>
+        <td>Identidade visual unificada</td>
+        <td class="status-partial">Parcial</td>
+        <td class="status-partial">Parcial</td>
+        <td class="status-no">Não</td>
+        <td class="status-partial">Parcial</td>
+        <td class="status-no">Não</td>
+        <td class="status-partial">Parcial</td>
+      </tr>
+      <tr>
+        <td>Conteúdo inédito vs. re-post</td>
+        <td class="status-yes">Original</td>
+        <td class="status-partial">Misto</td>
+        <td class="status-no">Repost</td>
+        <td class="status-partial">Misto</td>
+        <td class="status-no">Repost</td>
+        <td class="status-yes">Original</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- RECOMMENDATIONS -->
+  <div class="section-title">
+    Recomendações Estratégicas
+    <span class="line"></span>
+  </div>
+
+  <div class="rec-grid">
+
+    <div class="rec-card priority-high">
+      <div class="rec-platform">Prioridade Máxima</div>
+      <h4>Unificar ou eliminar perfil secundário</h4>
+      <p>@nancyhannahoficial (346 seg.) segue 930 contas — relação invertida prejudica algorítmo. Migrar seguidores para o principal @nancyhannahmusic e desativar o secundário, ou transformá-lo em arquivo de bastidores com identidade clara.</p>
+      <span class="tag tag-high">Urgente</span>
+    </div>
+
+    <div class="rec-card priority-high">
+      <div class="rec-platform">YouTube</div>
+      <h4>Criar calendário editorial fixo</h4>
+      <p>40 vídeos no total com frequência irregular. Estabelecer 1 vídeo por semana (lyric video, clipe, devocional, bastidores). Aproveitar o catálogo de 100 composições para gerar conteúdo consistente.</p>
+      <span class="tag tag-high">Prioridade Alta</span>
+    </div>
+
+    <div class="rec-card priority-mid">
+      <div class="rec-platform">Facebook</div>
+      <h4>Reativar ou arquivar</h4>
+      <p>Perfil parado desde maio/2025. Se for manter, publicar ao menos 1x/semana com links para o YouTube. Se não houver interesse, redirecionar tráfego para Instagram e arquivar a página.</p>
+      <span class="tag tag-mid">Média Prioridade</span>
+    </div>
+
+    <div class="rec-card priority-mid">
+      <div class="rec-platform">TikTok</div>
+      <h4>Explorar potencial máximo</h4>
+      <p>24K seguidores e 60K curtidas — é a plataforma com melhor engajamento proporcional. Criar série de vídeos curtos: trechos de louvores, testemunhos, dicas de composição. Apostar em trends gospel e hashtags nichadas.</p>
+      <span class="tag tag-mid">Média Prioridade</span>
+    </div>
+
+    <div class="rec-card priority-mid">
+      <div class="rec-platform">Geral</div>
+      <h4>Linktree com identidade visual</h4>
+      <p>Linktree atual é funcional mas genérico. Personalizar com foto de perfil consistente, paleta de cores (roxo/dourado/azul) e descrição que reflita o ministério musical.</p>
+      <span class="tag tag-mid">Média Prioridade</span>
+    </div>
+
+    <div class="rec-card priority-low">
+      <div class="rec-platform">Instagram Principal</div>
+      <h4>Reduzir taxa de seguimento</h4>
+      <p>1.352 seguindo é alto para 14K seguidores. Parar de seguir contas não estratégicas e focar em seguir perfis do nicho gospel, parceiros musicais e veículos de imprensa.</p>
+      <span class="tag tag-low">Baixa Prioridade</span>
+    </div>
+
+    <div class="rec-card priority-low">
+      <div class="rec-platform">Spotify / Apple Music</div>
+      <h4>Playlists e metadados</h4>
+      <p>Garantir que todas as músicas tenham letras, créditos corretos (Nancy Aparecida Machado), e investir em pitching para playlists gospel curriculares do Spotify.</p>
+      <span class="tag tag-low">Baixa Prioridade</span>
+    </div>
+
+    <div class="rec-card priority-low">
+      <div class="rec-platform">Geral</div>
+      <h4>Criar site ou press kit</h4>
+      <p>Não existe site oficial nem Wikipedia. Um site simples com bio, discografia, agenda e links fortaleceria a credibilidade profissional e facilitaria contato com imprensa e igrejas.</p>
+      <span class="tag tag-low">Baixa Prioridade</span>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    Auditoria de Redes &mdash; Nancy Hannah &bull; Gerado automaticamente em maio de 2026<br>
+    Dados coletados via fontes abertas: YouTube, Instagram, TikTok, Facebook, Spotify, Apple Music, Linktree
+  </div>
+
+</div>
+
+<script>
+  document.getElementById('dataAtual').textContent = new Date().toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  // CHART 1: Followers
+  new Chart(document.getElementById('chartFollowers'), {
+    type: 'bar',
+    data: {
+      labels: ['YouTube', 'Instagram (Pri.)', 'Instagram (Sec.)', 'TikTok', 'Facebook (est.)', 'Spotify'],
+      datasets: [{
+        label: 'Seguidores',
+        data: [6300, 14000, 346, 24000, 500, 0],
+        backgroundColor: ['#ff0000', '#e4405f', '#e4405f', '#000000', '#1877f2', '#1db954'],
+        borderRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#667788' } },
+        x: { grid: { display: false }, ticks: { color: '#8899aa', font: { size: 11 } } }
+      }
+    }
+  });
+
+  // CHART 2: Health
+  new Chart(document.getElementById('chartHealth'), {
+    type: 'radar',
+    data: {
+      labels: ['YouTube', 'Instagram (Pri.)', 'Instagram (Sec.)', 'TikTok', 'Facebook', 'Spotify'],
+      datasets: [{
+        label: 'Saúde (%)',
+        data: [40, 65, 15, 75, 10, 60],
+        backgroundColor: 'rgba(79,172,254,0.15)',
+        borderColor: '#4facfe',
+        borderWidth: 2,
+        pointBackgroundColor: '#4facfe',
+        pointRadius: 5
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        r: {
+          beginAtZero: true,
+          max: 100,
+          grid: { color: 'rgba(255,255,255,0.06)' },
+          ticks: { color: '#667788', backdropColor: 'transparent', stepSize: 20 },
+          pointLabels: { color: '#8899aa', font: { size: 12 } }
+        }
+      }
+    }
+  });
+</script>
+
+</body>
+</html>
