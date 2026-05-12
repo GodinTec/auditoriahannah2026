@@ -488,6 +488,31 @@
   .design-card:hover {
     transform: translateY(-4px);
   }
+  .preview-link {
+    display: block;
+    text-decoration: none;
+    cursor: pointer;
+    position: relative;
+  }
+  .preview-link::after {
+    content: '↗';
+    position: absolute;
+    top: 12px; right: 12px;
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    z-index: 2;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .preview-link:hover::after {
+    opacity: 1;
+  }
   .design-card .preview {
     aspect-ratio: 9/16;
     background-size: cover;
@@ -1027,12 +1052,14 @@ document.body.style.overflow = 'hidden';
   <div class="design-grid">
     <!-- MN v1 -->
     <div class="design-card">
+      <a href="https://godintec.github.io/prototiposhannah/missionaria-nancy/index.html" target="_blank" class="preview-link">
       <div class="preview" style="background-image:url('screenshots/mn-v1.png');background-size:cover;background-position:top;">
         <div class="overlay">
           <div class="v-name">Missionária Nancy</div>
           <div class="v-sub">Dark Gold Clássico</div>
         </div>
       </div>
+      </a>
       <div class="info">
         <span class="v-style">🏆 Recomendado</span>
         <h4>Versão 1 — Dark Gold</h4>
@@ -1048,12 +1075,14 @@ document.body.style.overflow = 'hidden';
 
     <!-- MN v2 -->
     <div class="design-card">
+      <a href="https://godintec.github.io/prototiposhannah/missionaria-nancy/v2.html" target="_blank" class="preview-link">
       <div class="preview" style="background-image:url('screenshots/mn-v2.png');background-size:cover;background-position:top;">
         <div class="overlay">
           <div class="v-name">Missionária Nancy</div>
           <div class="v-sub">Warm Creme Premium</div>
         </div>
       </div>
+      </a>
       <div class="info">
         <span class="v-style">Boa Opção</span>
         <h4>Versão 2 — Creme Premium</h4>
@@ -1069,12 +1098,14 @@ document.body.style.overflow = 'hidden';
 
     <!-- MN v3 -->
     <div class="design-card">
+      <a href="https://godintec.github.io/prototiposhannah/missionaria-nancy/v3.html" target="_blank" class="preview-link">
       <div class="preview" style="background-image:url('screenshots/mn-v3.png');background-size:cover;background-position:top;">
         <div class="overlay">
           <div class="v-name">Missionária Nancy</div>
           <div class="v-sub">Dark Bold com Versículo</div>
         </div>
       </div>
+      </a>
       <div class="info">
         <span class="v-style">Estilo Impactante</span>
         <h4>Versão 3 — Bold Dark</h4>
@@ -1090,12 +1121,14 @@ document.body.style.overflow = 'hidden';
 
     <!-- NH v1 -->
     <div class="design-card">
+      <a href="https://godintec.github.io/prototiposhannah/nancy-hannah/index.html" target="_blank" class="preview-link">
       <div class="preview" style="background-image:url('screenshots/nh-v1.png');background-size:cover;background-position:top;">
         <div class="overlay">
           <div class="v-name">Nancy Hannah</div>
           <div class="v-sub">Dark Azul Cobalto</div>
         </div>
       </div>
+      </a>
       <div class="info">
         <span class="v-style">🏆 Recomendado</span>
         <h4>Versão 1 — Azul Cobalto</h4>
@@ -1111,12 +1144,14 @@ document.body.style.overflow = 'hidden';
 
     <!-- NH v2 -->
     <div class="design-card">
+      <a href="https://godintec.github.io/prototiposhannah/nancy-hannah/v2.html" target="_blank" class="preview-link">
       <div class="preview" style="background-image:url('screenshots/nh-v2.png');background-size:cover;background-position:top;">
         <div class="overlay">
           <div class="v-name">Nancy Hannah</div>
           <div class="v-sub">Purple Vibrante</div>
         </div>
       </div>
+      </a>
       <div class="info">
         <span class="v-style">Boa Opção</span>
         <h4>Versão 2 — Purple Vibrante</h4>
@@ -1132,12 +1167,14 @@ document.body.style.overflow = 'hidden';
 
     <!-- NH v3 -->
     <div class="design-card">
+      <a href="https://godintec.github.io/prototiposhannah/nancy-hannah/v3.html" target="_blank" class="preview-link">
       <div class="preview" style="background-image:url('screenshots/nh-v3.png');background-size:cover;background-position:top;">
         <div class="overlay">
           <div class="v-name">Nancy Hannah</div>
           <div class="v-sub">Branco Minimalista</div>
         </div>
       </div>
+      </a>
       <div class="info">
         <span class="v-style">Estilo Premium</span>
         <h4>Versão 3 — Branco Minimalista</h4>
